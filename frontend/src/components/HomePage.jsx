@@ -171,9 +171,8 @@ const HomePage = () => {
         </div>
         <div className="features-grid">
           <div
-            className={`feature-card ${isVisible ? 'fade-in' : ''} ${
-              activeFeature === 0 ? 'active' : ''
-            }`}
+            className={`feature-card ${isVisible ? 'fade-in' : ''} ${activeFeature === 0 ? 'active' : ''
+              }`}
           >
             <div className="feature-icon">🎯</div>
             <h3>Career Matching</h3>
@@ -184,9 +183,8 @@ const HomePage = () => {
             <div className="feature-hover-effect"></div>
           </div>
           <div
-            className={`feature-card ${isVisible ? 'fade-in' : ''} ${
-              activeFeature === 1 ? 'active' : ''
-            }`}
+            className={`feature-card ${isVisible ? 'fade-in' : ''} ${activeFeature === 1 ? 'active' : ''
+              }`}
             style={{ animationDelay: '0.2s' }}
           >
             <div className="feature-icon">🏫</div>
@@ -198,9 +196,8 @@ const HomePage = () => {
             <div className="feature-hover-effect"></div>
           </div>
           <div
-            className={`feature-card ${isVisible ? 'fade-in' : ''} ${
-              activeFeature === 2 ? 'active' : ''
-            }`}
+            className={`feature-card ${isVisible ? 'fade-in' : ''} ${activeFeature === 2 ? 'active' : ''
+              }`}
             style={{ animationDelay: '0.4s' }}
           >
             <div className="feature-icon">💰</div>
@@ -227,25 +224,48 @@ const HomePage = () => {
             <div className="field-icon">💻</div>
             <h3>Technology</h3>
             <p>Software Development, Data Science, Cybersecurity</p>
-            <button className="field-explore-btn">Explore</button>
+            <button
+              className="field-explore-btn"
+              onClick={() => navigate('/career-explorer', { state: { field: 'Technology' } })}
+            >
+              Explore
+            </button>
           </div>
+
           <div className="career-field">
             <div className="field-icon">🔬</div>
             <h3>Science</h3>
             <p>Research, Biotechnology, Environmental Science</p>
-            <button className="field-explore-btn">Explore</button>
+            <button
+              className="field-explore-btn"
+              onClick={() => navigate('/career-explorer', { state: { field: 'Science' } })}
+            >
+              Explore
+            </button>
           </div>
+
           <div className="career-field">
             <div className="field-icon">📊</div>
             <h3>Business</h3>
             <p>Management, Finance, Marketing, Entrepreneurship</p>
-            <button className="field-explore-btn">Explore</button>
+            <button
+              className="field-explore-btn"
+              onClick={() => navigate('/career-explorer', { state: { field: 'Business' } })}
+            >
+              Explore
+            </button>
           </div>
+
           <div className="career-field">
             <div className="field-icon">🎨</div>
             <h3>Arts & Design</h3>
             <p>Graphic Design, Architecture, Fashion, Media</p>
-            <button className="field-explore-btn">Explore</button>
+            <button
+              className="field-explore-btn"
+              onClick={() => navigate('/career-explorer', { state: { field: 'Arts & Design' } })}
+            >
+              Explore
+            </button>
           </div>
         </div>
       </section>
