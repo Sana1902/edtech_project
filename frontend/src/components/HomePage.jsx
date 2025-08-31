@@ -48,10 +48,15 @@ const HomePage = () => {
       {/* Scroll Progress Bar */}
       <div className="scroll-progress-bar" style={{ width: `${scrollProgress}%` }}></div>
 
-      {/* Floating Action Button */}
+      {/* Floating Action Buttons */}
       <div className="floating-action-btn" onClick={handleStartQuiz}>
         <span>Start Quiz</span>
         <div className="fab-icon">🎯</div>
+      </div>
+      
+      <div className="floating-action-btn explore-fab" onClick={() => navigate('/explore')}>
+        <span>Explore</span>
+        <div className="fab-icon">🔍</div>
       </div>
 
       {/* Header */}
@@ -66,9 +71,9 @@ const HomePage = () => {
           <nav className="navigation">
             <a href="#features" onClick={(e) => { e.preventDefault(); scrollToSection('features'); }}>Features</a>
             <a href="#how-it-works" onClick={(e) => { e.preventDefault(); scrollToSection('how-it-works'); }}>How It Works</a>
-            <a href="#about" onClick={(e) => { e.preventDefault(); scrollToSection('about'); }}>About</a>
-            <button className="nav-cta" onClick={handleStartQuiz}>
-              Get Started
+            <button className="nav-link" onClick={() => navigate('/about')}>About</button>
+            <button className="nav-cta" onClick={() => navigate('/explore')}>
+              Explore
             </button>
             <Link to="/profile" className="profile-icon-link" aria-label="Profile">
               <div className="profile-icon">
@@ -106,9 +111,9 @@ const HomePage = () => {
                 Start Your Career Journey
                 <span className="btn-arrow">→</span>
               </button>
-              <a href="#about" className="cta-button secondary" onClick={(e) => { e.preventDefault(); scrollToSection('about'); }}>
-                Learn More
-              </a>
+              <button className="cta-button secondary" onClick={() => navigate('/explore')}>
+                Explore Careers
+              </button>
             </div>
             <div className="hero-stats">
               <div className="stat">

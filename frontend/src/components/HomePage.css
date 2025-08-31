@@ -45,6 +45,16 @@
   overflow: hidden;
 }
 
+.floating-action-btn.explore-fab {
+  bottom: 8rem;
+  background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
+  box-shadow: 0 6px 20px rgba(0, 180, 219, 0.4);
+}
+
+.floating-action-btn.explore-fab:hover {
+  box-shadow: 0 10px 25px rgba(0, 180, 219, 0.5);
+}
+
 .floating-action-btn:hover {
   transform: translateY(-5px) scale(1.05);
   box-shadow: 0 10px 25px rgba(106, 0, 255, 0.5);
@@ -236,7 +246,8 @@
   gap: 2.5rem;
 }
 
-.navigation a {
+.navigation a,
+.navigation .nav-link {
   color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
   font-weight: 500;
@@ -244,9 +255,13 @@
   position: relative;
   padding: 0.5rem 0;
   font-size: 0.95rem;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
-.navigation a::after {
+.navigation a::after,
+.navigation .nav-link::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -258,11 +273,13 @@
   transition: width 0.3s ease;
 }
 
-.navigation a:hover {
+.navigation a:hover,
+.navigation .nav-link:hover {
   color: #ffffff;
 }
 
-.navigation a:hover::after {
+.navigation a:hover::after,
+.navigation .nav-link:hover::after {
   width: 100%;
 }
 

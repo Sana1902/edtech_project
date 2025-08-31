@@ -3,7 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import RegistrationForm from './components/RegistrationForm';
 import LoginForm from './components/LoginForm';
 import HomePage from './components/HomePage';
-import QCForm from './components/Quiz'; // ✅ Import your quiz component
+import QCForm from './components/Quiz';
+import ExplorePage from './components/ExplorePage';
+import AboutPage from './components/AboutPage';
 import './App.css';
 
 const App = () => {
@@ -62,6 +64,42 @@ const App = () => {
           element={
             isAuthenticated ? (
               <QCForm />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+
+        {/* Explore Page */}
+        <Route
+          path="/career-explorer"
+          element={
+            isAuthenticated ? (
+              <ExplorePage />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+
+        {/* General Explore Page */}
+        <Route
+          path="/explore"
+          element={
+            isAuthenticated ? (
+              <ExplorePage />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+
+        {/* About Page */}
+        <Route
+          path="/about"
+          element={
+            isAuthenticated ? (
+              <AboutPage />
             ) : (
               <Navigate to="/" />
             )

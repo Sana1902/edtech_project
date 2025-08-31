@@ -277,7 +277,6 @@ const CareerInterestQuiz = () => {
   if (showResults) {
     const results = calculateResults();
     const topCategories = results.categories.slice(0, 3);
-    const featureVector = results.features;
     const avgTimePerQuestion = results.totalTime / questions.length;
     
     return (
