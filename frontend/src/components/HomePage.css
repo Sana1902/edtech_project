@@ -169,6 +169,7 @@
 
 .fade-in {
   animation: fadeIn 0.8s ease forwards;
+  opacity: 1 !important;
 }
 
 .slide-up {
@@ -204,9 +205,12 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  opacity: 0;
+  opacity: 1;
   transition: all 0.3s ease;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  /* Ensure header is always visible */
+  visibility: visible;
+  display: block;
 }
 
 .header-content {
@@ -244,6 +248,9 @@
   display: flex;
   align-items: center;
   gap: 2.5rem;
+  /* Ensure navigation is always visible */
+  visibility: visible;
+  opacity: 1;
 }
 
 .navigation a,
@@ -1468,7 +1475,11 @@
   }
   
   .navigation {
-    display: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    margin-top: 1rem;
   }
   
   .mobile-menu-btn {

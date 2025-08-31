@@ -1,12 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './LoginForm.css';
 
-const LoginForm = ({ onBack, onLoginSuccess }) => {
+const LoginForm = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login, error: authError, clearError } = useAuth();
+
+  // Clear auth errors when component mounts
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,13 +38,16 @@ const LoginForm = ({ onBack, onLoginSuccess }) => {
 
     setIsLoading(true);
     try {
-      console.log('Login data:', formData);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      onLoginSuccess();
-      navigate('/home');
+      const result = await login(formData.email, formData.password);
+      
+      if (result.success) {
+        navigate('/home');
+      } else {
+        setErrors({ submit: result.error || 'Login failed. Please try again.' });
+      }
     } catch (error) {
       console.error('Login error:', error);
-      setErrors({ submit: error.message || 'Login failed. Please try again.' });
+      setErrors({ submit: 'An unexpected error occurred. Please try again.' });
     } finally {
       setIsLoading(false);
     }
@@ -45,11 +55,18 @@ const LoginForm = ({ onBack, onLoginSuccess }) => {
 
   return (
     <div className="login-form-container">
-      <button className="back-button" onClick={onBack}>&larr; Back to Home</button>
+      <button className="back-button" onClick={() => navigate('/')}>&larr; Back to Home</button>
       <div className="login-form-card">
         <h2>Login to Skill Map</h2>
         <p className="subtitle">Enter your credentials to access your account</p>
-        {errors.submit && <div className="error-message">{errors.submit}</div>}
+        
+        {/* Display authentication errors */}
+        {(errors.submit || authError) && (
+          <div className="error-message">
+            {errors.submit || authError}
+          </div>
+        )}
+        
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="email">Email</label>
@@ -61,6 +78,7 @@ const LoginForm = ({ onBack, onLoginSuccess }) => {
               onChange={handleChange}
               className={errors.email ? 'error' : ''}
               placeholder="Enter your email"
+              disabled={isLoading}
             />
             {errors.email && <span className="error-text">{errors.email}</span>}
           </div>
@@ -75,6 +93,7 @@ const LoginForm = ({ onBack, onLoginSuccess }) => {
               onChange={handleChange}
               className={errors.password ? 'error' : ''}
               placeholder="Enter your password"
+              disabled={isLoading}
             />
             {errors.password && <span className="error-text">{errors.password}</span>}
           </div>
@@ -93,7 +112,7 @@ const LoginForm = ({ onBack, onLoginSuccess }) => {
         </form>
 
         <div className="signup-link">
-          Don't have an account? <button onClick={onBack}>Sign up</button>
+          Don't have an account? <button onClick={() => navigate('/register')}>Sign up</button>
         </div>
       </div>
     </div>

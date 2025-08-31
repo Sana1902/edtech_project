@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import RegistrationForm from './components/RegistrationForm';
 import LoginForm from './components/LoginForm';
 import HomePage from './components/HomePage';
@@ -8,15 +9,28 @@ import ExplorePage from './components/ExplorePage';
 import AboutPage from './components/AboutPage';
 import './App.css';
 
-const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+  
+  return isAuthenticated ? children : <Navigate to="/" />;
+};
 
-  const handleLoginSuccess = () => {
-    setIsAuthenticated(true);
-  };
+// Main App Component
+const AppContent = () => {
+  const { isAuthenticated, logout } = useAuth();
 
   const handleLogout = () => {
-    setIsAuthenticated(false);
+    logout();
   };
 
   return (
@@ -27,7 +41,7 @@ const App = () => {
           path="/"
           element={
             !isAuthenticated ? (
-              <AuthLandingPage onLoginSuccess={handleLoginSuccess} />
+              <AuthLandingPage />
             ) : (
               <Navigate to="/home" />
             )
@@ -37,36 +51,54 @@ const App = () => {
         {/* Login Page */}
         <Route
           path="/login"
-          element={<LoginForm onBack={() => {}} onLoginSuccess={handleLoginSuccess} />}
+          element={
+            !isAuthenticated ? (
+              <LoginForm />
+            ) : (
+              <Navigate to="/home" />
+            )
+          }
         />
 
         {/* Registration Page */}
         <Route
           path="/register"
-          element={<RegistrationForm onBack={() => {}} />}
+          element={
+            !isAuthenticated ? (
+              <RegistrationForm />
+            ) : (
+              <Navigate to="/home" />
+            )
+          }
         />
 
         {/* Home Page */}
         <Route
           path="/home"
           element={
-            isAuthenticated ? (
+            <ProtectedRoute>
               <HomePage onLogout={handleLogout} />
-            ) : (
-              <Navigate to="/" />
-            )
+            </ProtectedRoute>
           }
         />
 
-        {/* ✅ Quiz Page */}
+        {/* Quiz Page */}
         <Route
           path="/quiz"
           element={
-            isAuthenticated ? (
+            <ProtectedRoute>
               <QCForm />
-            ) : (
-              <Navigate to="/" />
-            )
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Profile Page */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
           }
         />
 
@@ -111,7 +143,7 @@ const App = () => {
 };
 
 // Landing page with Login/Register buttons
-const AuthLandingPage = ({ onLoginSuccess }) => {
+const AuthLandingPage = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
 
@@ -143,11 +175,20 @@ const AuthLandingPage = ({ onLoginSuccess }) => {
           </div>
         </div>
       ) : showLogin ? (
-        <LoginForm onBack={() => setShowLogin(false)} onLoginSuccess={onLoginSuccess} />
+        <LoginForm onBack={() => setShowLogin(false)} />
       ) : (
         <RegistrationForm onBack={() => setShowRegister(false)} />
       )}
     </div>
+  );
+};
+
+// Wrapper App Component with AuthProvider
+const App = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 };
 
