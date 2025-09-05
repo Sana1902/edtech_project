@@ -8,6 +8,7 @@ import QCForm from './components/Quiz';
 import ExplorePage from './components/ExplorePage';
 import AboutPage from './components/AboutPage';
 import './App.css';
+import Profile from './components/Profile';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
