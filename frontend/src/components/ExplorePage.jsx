@@ -15,7 +15,7 @@ const ExplorePage = () => {
     setIsVisible(true);
   }, []);
 
-  // Career fields data
+  // Enhanced career fields data with more career paths
   const careerFields = {
     Technology: {
       icon: "💻",
@@ -51,6 +51,24 @@ const ExplorePage = () => {
           salary: "₹6-18 LPA",
           demand: "High",
         },
+        {
+          name: "Cloud Architect",
+          description: "Design and manage cloud infrastructure",
+          salary: "₹10-30 LPA",
+          demand: "High",
+        },
+        {
+          name: "Blockchain Developer",
+          description: "Develop decentralized applications",
+          salary: "₹8-22 LPA",
+          demand: "Growing",
+        },
+        {
+          name: "IoT Specialist",
+          description: "Work with Internet of Things devices and systems",
+          salary: "₹5-16 LPA",
+          demand: "Growing",
+        },
       ],
       colleges: [
         "Pune University",
@@ -58,6 +76,8 @@ const ExplorePage = () => {
         "VIT Pune",
         "Symbiosis",
         "SPIT Mumbai",
+        "COEP Pune",
+        "ICT Mumbai",
       ],
       skills: [
         "Programming",
@@ -65,6 +85,8 @@ const ExplorePage = () => {
         "Analytical Thinking",
         "Teamwork",
         "Continuous Learning",
+        "Mathematics",
+        "Creativity",
       ],
     },
     Science: {
@@ -101,6 +123,24 @@ const ExplorePage = () => {
           salary: "₹5-18 LPA",
           demand: "Medium",
         },
+        {
+          name: "Microbiologist",
+          description: "Study microorganisms and their effects",
+          salary: "₹4-14 LPA",
+          demand: "Medium",
+        },
+        {
+          name: "Geneticist",
+          description: "Study genes and heredity",
+          salary: "₹5-16 LPA",
+          demand: "Growing",
+        },
+        {
+          name: "Marine Biologist",
+          description: "Study ocean life and ecosystems",
+          salary: "₹4-12 LPA",
+          demand: "Medium",
+        },
       ],
       colleges: [
         "IISER Pune",
@@ -108,6 +148,8 @@ const ExplorePage = () => {
         "BARC Mumbai",
         "NCL Pune",
         "IIT Bombay",
+        "Haffkine Institute",
+        "Agharkar Research Institute",
       ],
       skills: [
         "Research Skills",
@@ -115,6 +157,8 @@ const ExplorePage = () => {
         "Laboratory Skills",
         "Critical Thinking",
         "Data Analysis",
+        "Attention to Detail",
+        "Scientific Method",
       ],
     },
     Business: {
@@ -151,6 +195,24 @@ const ExplorePage = () => {
           salary: "₹4-12 LPA",
           demand: "Medium",
         },
+        {
+          name: "Supply Chain Manager",
+          description: "Manage product flow from creation to distribution",
+          salary: "₹5-16 LPA",
+          demand: "High",
+        },
+        {
+          name: "Investment Banker",
+          description: "Help companies raise capital and provide financial advice",
+          salary: "₹8-25 LPA",
+          demand: "High",
+        },
+        {
+          name: "Management Consultant",
+          description: "Advise organizations on how to improve performance",
+          salary: "₹7-20 LPA",
+          demand: "High",
+        },
       ],
       colleges: [
         "NMIMS Mumbai",
@@ -158,6 +220,8 @@ const ExplorePage = () => {
         "SIBM Pune",
         "XIMB Bhubaneswar",
         "IIM Nagpur",
+        "JBIMS Mumbai",
+        "SIMS Pune",
       ],
       skills: [
         "Leadership",
@@ -165,6 +229,8 @@ const ExplorePage = () => {
         "Strategic Thinking",
         "Financial Literacy",
         "Problem Solving",
+        "Negotiation",
+        "Decision Making",
       ],
     },
     "Arts & Design": {
@@ -201,6 +267,24 @@ const ExplorePage = () => {
           salary: "₹2-8 LPA",
           demand: "Growing",
         },
+        {
+          name: "Interior Designer",
+          description: "Design functional and aesthetically pleasing indoor spaces",
+          salary: "₹3-12 LPA",
+          demand: "Medium",
+        },
+        {
+          name: "Game Designer",
+          description: "Create concepts and rules for video games",
+          salary: "₹4-16 LPA",
+          demand: "Growing",
+        },
+        {
+          name: "Animator",
+          description: "Create animated content for various media",
+          salary: "₹3-10 LPA",
+          demand: "Medium",
+        },
       ],
       colleges: [
         "NID Ahmedabad",
@@ -208,6 +292,8 @@ const ExplorePage = () => {
         "CEPT Ahmedabad",
         "JJ School of Arts",
         "MIT Pune",
+        "Sir JJ Institute of Applied Art",
+        "Whistling Woods International",
       ],
       skills: [
         "Creativity",
@@ -215,6 +301,224 @@ const ExplorePage = () => {
         "Communication",
         "Technical Skills",
         "Trend Awareness",
+        "Attention to Detail",
+        "Adaptability",
+      ],
+    },
+    Healthcare: {
+      icon: "🏥",
+      description: "Care for people's health and wellbeing",
+      careers: [
+        {
+          name: "Doctor",
+          description: "Diagnose and treat medical conditions",
+          salary: "₹6-25 LPA",
+          demand: "Very High",
+        },
+        {
+          name: "Nurse",
+          description: "Provide patient care and support",
+          salary: "₹3-8 LPA",
+          demand: "High",
+        },
+        {
+          name: "Pharmacist",
+          description: "Prepare and dispense medications",
+          salary: "₹3-10 LPA",
+          demand: "High",
+        },
+        {
+          name: "Physiotherapist",
+          description: "Help patients recover movement and function",
+          salary: "₹3-9 LPA",
+          demand: "Growing",
+        },
+        {
+          name: "Nutritionist",
+          description: "Advise on diet and nutrition for health",
+          salary: "₹3-8 LPA",
+          demand: "Growing",
+        },
+        {
+          name: "Medical Researcher",
+          description: "Conduct research to improve health outcomes",
+          salary: "₹5-15 LPA",
+          demand: "Medium",
+        },
+        {
+          name: "Dentist",
+          description: "Diagnose and treat dental issues",
+          salary: "₹4-12 LPA",
+          demand: "High",
+        },
+        {
+          name: "Psychologist",
+          description: "Study behavior and mental processes",
+          salary: "₹4-14 LPA",
+          demand: "Growing",
+        },
+      ],
+      colleges: [
+        "AIIMS Delhi",
+        "KEM Hospital Mumbai",
+        "BJ Medical College Pune",
+        "Grant Medical College Mumbai",
+        "Armed Forces Medical College Pune",
+        "Nair Hospital Dental College",
+        "Terna Medical College",
+      ],
+      skills: [
+        "Empathy",
+        "Communication",
+        "Attention to Detail",
+        "Problem Solving",
+        "Technical Knowledge",
+        "Patience",
+        "Teamwork",
+      ],
+    },
+    Engineering: {
+      icon: "⚙️",
+      description: "Design, build, and maintain systems and structures",
+      careers: [
+        {
+          name: "Mechanical Engineer",
+          description: "Design and develop mechanical systems",
+          salary: "₹4-12 LPA",
+          demand: "Medium",
+        },
+        {
+          name: "Civil Engineer",
+          description: "Design and supervise construction projects",
+          salary: "₹4-14 LPA",
+          demand: "High",
+        },
+        {
+          name: "Electrical Engineer",
+          description: "Design and develop electrical systems",
+          salary: "₹4-13 LPA",
+          demand: "Medium",
+        },
+        {
+          name: "Electronics Engineer",
+          description: "Design electronic circuits and systems",
+          salary: "₹4-15 LPA",
+          demand: "Medium",
+        },
+        {
+          name: "Chemical Engineer",
+          description: "Design processes for chemical production",
+          salary: "₹4-14 LPA",
+          demand: "Medium",
+        },
+        {
+          name: "Aerospace Engineer",
+          description: "Design aircraft and spacecraft",
+          salary: "₹5-18 LPA",
+          demand: "Growing",
+        },
+        {
+          name: "Automobile Engineer",
+          description: "Design and develop vehicles",
+          salary: "₹4-14 LPA",
+          demand: "Medium",
+        },
+        {
+          name: "Robotics Engineer",
+          description: "Design and build robots and automated systems",
+          salary: "₹5-16 LPA",
+          demand: "Growing",
+        },
+      ],
+      colleges: [
+        "IIT Bombay",
+        "COEP Pune",
+        "VJTI Mumbai",
+        "ICT Mumbai",
+        "Walchand College of Engineering",
+        "Sardar Patel College of Engineering",
+        "DKTE Ichalkaranji",
+      ],
+      skills: [
+        "Mathematics",
+        "Problem Solving",
+        "Technical Drawing",
+        "Analytical Thinking",
+        "Creativity",
+        "Attention to Detail",
+        "Project Management",
+      ],
+    },
+    Education: {
+      icon: "📚",
+      description: "Teach and shape future generations",
+      careers: [
+        {
+          name: "School Teacher",
+          description: "Educate students at primary or secondary level",
+          salary: "₹3-8 LPA",
+          demand: "High",
+        },
+        {
+          name: "Professor",
+          description: "Teach at college or university level",
+          salary: "₹6-18 LPA",
+          demand: "Medium",
+        },
+        {
+          name: "Education Administrator",
+          description: "Manage educational institutions",
+          salary: "₹5-15 LPA",
+          demand: "Medium",
+        },
+        {
+          name: "Special Education Teacher",
+          description: "Work with students with special needs",
+          salary: "₹3-9 LPA",
+          demand: "Growing",
+        },
+        {
+          name: "Curriculum Developer",
+          description: "Design educational programs and materials",
+          salary: "₹4-12 LPA",
+          demand: "Medium",
+        },
+        {
+          name: "Guidance Counselor",
+          description: "Help students with academic and personal issues",
+          salary: "₹3-8 LPA",
+          demand: "Medium",
+        },
+        {
+          name: "Corporate Trainer",
+          description: "Provide training to employees in businesses",
+          salary: "₹4-14 LPA",
+          demand: "Growing",
+        },
+        {
+          name: "Education Consultant",
+          description: "Advise on educational practices and policies",
+          salary: "₹5-16 LPA",
+          demand: "Medium",
+        },
+      ],
+      colleges: [
+        "TISS Mumbai",
+        "SNDT Women's University",
+        "SPPU Pune",
+        "Mumbai University",
+        "Azim Premji University",
+        "FLAME University",
+        "Symbiosis College of Education",
+      ],
+      skills: [
+        "Communication",
+        "Patience",
+        "Leadership",
+        "Creativity",
+        "Organization",
+        "Adaptability",
+        "Subject Knowledge",
       ],
     },
   };
@@ -361,7 +665,7 @@ const ExplorePage = () => {
               </button>
               <button
                 className="action-btn secondary"
-                onClick={handleBackToHome}
+                onClick={() => setSelectedField("All")}
                 aria-label="Explore other fields"
               >
                 Explore Other Fields
@@ -373,13 +677,7 @@ const ExplorePage = () => {
 
       {/* Footer */}
       <footer className="explore-footer">
-        <p>
-          Ready to discover your career path? Take our comprehensive assessment
-          to get personalized recommendations!
-        </p>
-        <button className="cta-button" onClick={handleStartQuiz}>
-          Start Your Career Journey →
-        </button>
+        <p>© {new Date().getFullYear()} Skill-Map Maharashtra</p>
       </footer>
     </div>
   );

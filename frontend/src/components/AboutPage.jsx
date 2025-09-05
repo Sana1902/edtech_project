@@ -22,59 +22,25 @@ const AboutPage = () => {
     navigate('/explore');
   };
 
-  const teamMembers = [
+ const teamMembers = [
     {
-      name: 'Dr. Priya Sharma',
-      role: 'Founder & CEO',
-      description: 'Education expert with 15+ years in career counseling',
-      avatar: '👩‍🏫',
-      expertise: ['Career Guidance', 'Education Policy', 'Student Development']
+      name: 'Er.Sana Mujawar',
+      role: 'Co-Founder & Backend/AI Developer',
+      description: 'Final Year Artificial Intelligence & Machine Learning Engineering Student',
+      avatar: '👩‍💻',
+      expertise: ['NodeJS', 'AI Development', 'Machine Learning']
     },
     {
-      name: 'Rajesh Kumar',
-      role: 'Head of Technology',
-      description: 'Tech leader passionate about educational innovation',
-      avatar: '👨‍💻',
-      expertise: ['AI/ML', 'EdTech', 'Platform Development']
-    },
-    {
-      name: 'Meera Patel',
-      role: 'Career Counselor',
-      description: 'Specialized in Maharashtra education system',
-      avatar: '👩‍🎓',
-      expertise: ['Student Counseling', 'College Admissions', 'Scholarship Guidance']
-    },
-    {
-      name: 'Amit Deshmukh',
-      role: 'Partnership Manager',
-      description: 'Building connections with colleges and institutions',
-      avatar: '🤝',
-      expertise: ['Institutional Relations', 'Partnerships', 'Network Building']
+      name: 'Er.Prerana Suryawanshi',
+      role: 'Co-Founder & UI-UX Designer',
+      description: 'Final Year Artificial Intelligence & Machine Learning Engineering Student',
+      avatar: '👩‍💻',
+      expertise: ['ReactJS', 'AI Development', 'Machine Learning']
     }
+   
   ];
 
-  const milestones = [
-    {
-      year: '2024',
-      title: 'Platform Launch',
-      description: 'Skill-Map Maharashtra officially launched to serve students across Maharashtra'
-    },
-    {
-      year: '2023',
-      title: 'Pilot Program',
-      description: 'Successfully tested with 500+ students in Pune and Mumbai'
-    },
-    {
-      year: '2022',
-      title: 'Research & Development',
-      description: 'Extensive research on Maharashtra education landscape and student needs'
-    },
-    {
-      year: '2021',
-      title: 'Concept Development',
-      description: 'Initial idea and vision for democratizing career guidance'
-    }
-  ];
+  // milestones array removed as it was unused
 
   const values = [
     {
@@ -249,30 +215,7 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Journey Section */}
-      <section className="journey-section">
-        <div className="section-container">
-          <div className={`section-content ${isVisible ? 'fade-in' : ''}`}>
-            <h2>Our Journey</h2>
-            <p className="section-description">
-              From a simple idea to a comprehensive platform, here's how Skill-Map 
-              Maharashtra evolved to serve students across the state.
-            </p>
-            <div className="timeline">
-              {milestones.map((milestone, index) => (
-                <div key={index} className="timeline-item">
-                  <div className="timeline-marker"></div>
-                  <div className="timeline-content">
-                    <div className="timeline-year">{milestone.year}</div>
-                    <h3 className="timeline-title">{milestone.title}</h3>
-                    <p className="timeline-description">{milestone.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Journey Section removed as requested */}
 
       {/* Values Section */}
       <section className="values-section">

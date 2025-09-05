@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './LoginForm.css';
 
-const LoginForm = () => {
+const LoginForm = ({ onBack }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +55,7 @@ const LoginForm = () => {
 
   return (
     <div className="login-form-container">
-      <button className="back-button" onClick={() => navigate('/')}>&larr; Back to Home</button>
+      <button className="back-button" onClick={() => (onBack ? onBack() : navigate('/'))}>&larr; Back to Home</button>
       <div className="login-form-card">
         <h2>Login to Skill Map</h2>
         <p className="subtitle">Enter your credentials to access your account</p>

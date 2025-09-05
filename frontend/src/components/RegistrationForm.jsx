@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './RegistrationForm.css';
 
-const RegistrationForm = () => {
+const RegistrationForm = ({ onBack }) => {
   const { 
     register: registerForm, 
     handleSubmit, 
@@ -20,7 +20,7 @@ const RegistrationForm = () => {
   // Clear auth errors when component mounts
   useEffect(() => {
     clearError();
-  }, []);
+  }, [clearError]);
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
@@ -50,7 +50,7 @@ const RegistrationForm = () => {
           <p>You are successfully registered. You can now login with your credentials.</p>
           <button 
             className="success-button"
-            onClick={() => navigate('/')}
+            onClick={() => (onBack ? onBack() : navigate('/'))}
           >
             Back to Welcome
           </button>
@@ -61,7 +61,7 @@ const RegistrationForm = () => {
 
   return (
     <div className="registration-form-container">
-      <button className="back-button" onClick={() => navigate('/')}>&larr; Back to Welcome</button>
+      <button className="back-button" onClick={() => (onBack ? onBack() : navigate('/'))}>&larr; Back to Welcome</button>
       
       <div className="registration-form-card">
         <h2>Student Registration</h2>

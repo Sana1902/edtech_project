@@ -506,19 +506,6 @@ function getCategoryDescription(category) {
   return descriptions[category] || "This area aligns with your interests and strengths.";
 }
 
-function getCareerSuggestions(category) {
-  const suggestions = {
-    "Creative & Artistic": ["Graphic Designer", "Art Director", "Animator", "Fashion Designer", "Photographer"],
-    "Logical & Scientific": ["Data Scientist", "Software Developer", "Research Scientist", "Mathematician", "Physicist"],
-    "Technical & Mechanical": ["Mechanical Engineer", "Automotive Technician", "Aerospace Engineer", "Robotics Engineer", "Civil Engineer"],
-    "Medical & Biological": ["Doctor", "Surgeon", "Pharmacist", "Dentist", "Veterinarian"],
-    "Social Sciences & Humanities": ["Psychologist", "Historian", "Sociologist", "Social Worker", "Archaeologist"],
-    "Languages & Literature": ["Writer", "Translator", "Editor", "Linguist", "Journalist"],
-    "Business & Communication": ["Business Manager", "Marketing Director", "HR Specialist", "Entrepreneur", "Public Relations Manager"],
-    "Hobbies & Well-being": ["Fitness Trainer", "Yoga Instructor", "Nutritionist", "Physical Therapist", "Sports Coach"]
-  };
-  
-  return suggestions[category] || ["Career Counselor", "Life Coach", "Education Consultant"];
-}
+// removed unused getCareerSuggestions to satisfy eslint no-unused-vars
 
 export default CareerInterestQuiz;

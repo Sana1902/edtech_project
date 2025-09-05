@@ -47,18 +47,6 @@ const HomePage = () => {
     <div className="home-container">
       {/* Scroll Progress Bar */}
       <div className="scroll-progress-bar" style={{ width: `${scrollProgress}%` }}></div>
-
-      {/* Floating Action Buttons */}
-      <div className="floating-action-btn" onClick={handleStartQuiz}>
-        <span>Start Quiz</span>
-        <div className="fab-icon">🎯</div>
-      </div>
-      
-      <div className="floating-action-btn explore-fab" onClick={() => navigate('/explore')}>
-        <span>Explore</span>
-        <div className="fab-icon">🔍</div>
-      </div>
-
       {/* Header */}
       <header className={`header ${isVisible ? 'fade-in' : ''}`}>
         <div className="header-content">
@@ -384,21 +372,21 @@ const HomePage = () => {
             <p>
               Comprehensive guide to career options after 10th and 12th
             </p>
-            <button className="download-btn">Download PDF</button>
+            <button className="download-btn" onClick={() => window.open('/CareerHandbook.pdf', '_blank', 'noopener,noreferrer')}>Download PDF</button>
           </div>
           <div className="resource-card">
             <div className="resource-icon">📝</div>
             <h3>Scholarship List</h3>
             <p>List of scholarships available for Maharashtra students</p>
-            <button className="download-btn">Download PDF</button>
+            <button className="download-btn" onClick={() => window.open('/maharashtra_scholarships_class11_12.pdf', '_blank', 'noopener,noreferrer')}>Download PDF</button>
           </div>
           <div className="resource-card">
             <div className="resource-icon">🏆</div>
-            <h3>Exam Calendar</h3>
+            <h3>Skill Development Programs</h3>
             <p>
-              Important dates for entrance exams and applications
+            Free & Paid Courses · Maharashtra-focused · Quick application tips
             </p>
-            <button className="download-btn">Download PDF</button>
+            <button className="download-btn" onClick={() => window.open('/Skill_Development_Programs_8to12_SkillMapMaharashtra.pdf', '_blank', 'noopener,noreferrer')}>Download PDF</button>
           </div>
         </div>
       </section>
