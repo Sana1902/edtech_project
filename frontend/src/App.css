@@ -244,3 +244,86 @@
   font-size: 18px;
   font-weight: 500;
 }
+
+/* Hide Google Translate UI elements globally but preserve functionality */
+.goog-te-banner-frame,
+.goog-te-gadget,
+.goog-te-gadget-simple,
+.goog-te-gadget-icon,
+.goog-te-ftab,
+.goog-te-ftab-link,
+.goog-te-menu-value,
+.goog-te-menu-value span,
+.goog-te-menu-value:before,
+.goog-te-banner-frame.skiptranslate,
+iframe[src*="translate.google.com"],
+iframe[src*="translate.googleapis.com"],
+div[class*="skiptranslate"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  z-index: -9999 !important;
+}
+
+/* Hide the select element but keep it functional */
+.goog-te-combo {
+  display: none !important;
+  visibility: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  z-index: -9999 !important;
+}
+
+/* Hide the main translate element container but keep it functional */
+#google_translate_element {
+  display: none !important;
+  visibility: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  z-index: -9999 !important;
+}
+
+/* Remove any body padding/margin added by Google Translate */
+body {
+  top: 0 !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+body.goog-te-banner-frame {
+  top: 0 !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Hide any translate notifications or bars */
+.goog-te-banner-frame.skiptranslate {
+  display: none !important;
+}
+
+#google_translate_element {
+  display: none !important;
+}
+
+/* Additional aggressive hiding */
+*[class*="goog-te"] {
+  display: none !important;
+}
+
+*[id*="google_translate"] {
+  display: none !important;
+}
+
+/* Hide any iframes from Google Translate */
+iframe[src*="translate"] {
+  display: none !important;
+  visibility: hidden !important;
+}
