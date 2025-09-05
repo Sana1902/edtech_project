@@ -9,6 +9,7 @@ import ExplorePage from './components/ExplorePage';
 import AboutPage from './components/AboutPage';
 import './App.css';
 import Profile from './components/Profile';
+import Analytics from './components/Analytics';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -89,6 +90,16 @@ const AppContent = () => {
           element={
             <ProtectedRoute>
               <QCForm />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Analytics Page */}
+        <Route
+          path="/analytics"
+          element={
+            <ProtectedRoute>
+              <Analytics />
             </ProtectedRoute>
           }
         />
