@@ -4,7 +4,7 @@
 .quiz-container, .quiz-results-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
-  color: white;
+  color: rgb(0, 180, 219);
   font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 20px;
   position: relative;
@@ -739,4 +739,53 @@
   .results-stats {
     grid-template-columns: 1fr;
   }
+}
+
+/* Analytics Enhancements */
+.results-section .category-results .category-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-height: 140px;
+}
+
+.results-section .category-results .category-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+}
+
+.results-section .category-results .category-card h3 {
+  margin-top: 6px;
+}
+
+.career-card {
+  line-height: 1.6;
+}
+
+.career-card strong {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.career-card a {
+  color: #6a00ff;
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(106, 0, 255, 0.4);
+}
+
+.career-card a:hover {
+  color: #8a2be2;
+  border-bottom-color: rgba(138, 43, 226, 0.6);
+}
+
+.career-recommendations .career-card ul li {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+}
+
+.career-recommendations .career-card ul li:last-child {
+  margin-bottom: 0;
+}
+
+.results-stats .stat-card p {
+  opacity: 0.85;
 }

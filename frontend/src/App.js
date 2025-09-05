@@ -10,6 +10,7 @@ import AboutPage from './components/AboutPage';
 import './App.css';
 import Profile from './components/Profile';
 import Analytics from './components/Analytics';
+import Chatbot from './components/Chatbot';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -150,6 +151,7 @@ const AppContent = () => {
           }
         />
       </Routes>
+      <Chatbot />
     </Router>
   );
 };

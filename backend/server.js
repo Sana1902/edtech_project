@@ -37,6 +37,7 @@ app.use(cors({
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/ml', require('./routes/ml'));
+app.use('/api/chat', require('./routes/chat'));
 
 // Health check route
 app.get('/api/health', (req, res) => {
