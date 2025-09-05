@@ -20,7 +20,7 @@ const RegistrationForm = () => {
   // Clear auth errors when component mounts
   useEffect(() => {
     clearError();
-  }, [clearError]);
+  }, []);
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);

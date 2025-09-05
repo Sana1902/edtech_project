@@ -274,6 +274,10 @@ const CareerInterestQuiz = () => {
     navigate('/');
   };
 
+  const handleViewDetailedAnalysis = () => {
+    navigate('/analytics', { state: { answers } });
+  };
+
   if (showResults) {
     const results = calculateResults();
     const topCategories = results.categories.slice(0, 3);
@@ -341,21 +345,7 @@ const CareerInterestQuiz = () => {
             </div>
           </div>
           
-          <div className="results-section">
-            <h2>Career Recommendations</h2>
-            <div className="career-recommendations">
-              {topCategories.map((category, index) => (
-                <div key={category.category} className="career-card" style={{ animationDelay: `${0.6 + index * 0.2}s` }}>
-                  <h3>{category.category}</h3>
-                  <ul>
-                    {getCareerSuggestions(category.category).map((career, i) => (
-                      <li key={i}>{career}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Detailed Analytics moved to a separate page */}
           
           <div className="results-section">
             <h2>Next Steps</h2>
@@ -387,7 +377,7 @@ const CareerInterestQuiz = () => {
               <span className="btn-icon">🏠</span>
               Return to Home
             </button>
-            <button className="btn btn-accent">
+            <button className="btn btn-accent" onClick={handleViewDetailedAnalysis}>
               <span className="btn-icon">📊</span>
               View Detailed Analysis
             </button>
