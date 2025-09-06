@@ -26,11 +26,17 @@ app.use('/api/', limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// CORS middleware - Updated to allow port 3001
+// CORS middleware - Updated to allow multiple origins
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? ['https://yourdomain.com'] 
-    : ['http://localhost:3000', 'http://localhost:3001'], // Added port 3001
+    : [
+        'http://localhost:3000', 
+        'http://localhost:3001',
+        'http://192.168.6.1:3000',
+        'http://192.168.1.1:3000',
+        'http://127.0.0.1:3000'
+      ],
   credentials: true
 }));
 
