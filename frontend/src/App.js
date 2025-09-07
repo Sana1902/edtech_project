@@ -12,6 +12,7 @@ import Profile from './components/Profile';
 import Analytics from './components/Analytics';
 import Chatbot from './components/Chatbot';
 import LanguageToggle from './components/LanguageToggle';
+import backImage from './assets/backimage.avif';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -165,7 +166,11 @@ const AuthLandingPage = () => {
 
   return (
     <div className="app">
-      <div className="background">
+      {/* Use the imported image here */}
+      <div
+        className="background"
+        style={{ backgroundImage: `url(${backImage})` }}
+      >
         <div className="gradient-circle top-left"></div>
         <div className="gradient-circle bottom-right"></div>
       </div>
