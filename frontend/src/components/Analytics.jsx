@@ -8,8 +8,9 @@ import 'leaflet/dist/leaflet.css';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-const API_BASE = process.env.REACT_APP_API_URL || 'https://skill-map-mh.onrender.com/api';
-// Leaflet removed; using MapLibre for map rendering
+
+// ✅ Use environment variable, fallback to Render API
+const API_BASE = process.env.REACT_APP_API_BASE || 'https://skill-map-mh.onrender.com/api';
 
 const Analytics = () => {
   const navigate = useNavigate();
@@ -23,12 +24,9 @@ const Analytics = () => {
   const [nearbyColleges, setNearbyColleges] = useState([]);
   const [mapError, setMapError] = useState(null);
   const [mapRenderReady, setMapRenderReady] = useState(false);
-  const [locationStatus, setLocationStatus] = useState('unknown'); // 'granted' | 'denied' | 'prompt' | 'unknown'
-// Put this at the top of the file, outside the component
+  const [locationStatus, setLocationStatus] = useState('unknown');
 
-// ✅ no API_BASE here
-
-
+  // Fetch ML prediction
   useEffect(() => {
     const answers = location.state?.answers;
     if (!answers) {
@@ -65,37 +63,38 @@ const Analytics = () => {
     };
 
     run();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.state, token]);
 
-  // Request location and fetch nearby colleges via Overpass API
+  // Request location + fetch colleges
   const requestLocation = async () => {
-    const getPosition = () => new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject(new Error('Geolocation not supported'));
-        return;
-      }
-      navigator.geolocation.getCurrentPosition(
-        (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        (err) => reject(err),
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-      );
-    });
+    const getPosition = () =>
+      new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject(new Error('Geolocation not supported'));
+          return;
+        }
+        navigator.geolocation.getCurrentPosition(
+          (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+          (err) => reject(err),
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+        );
+      });
 
     const fetchOverpass = async (lat, lng) => {
-      // Query colleges/universities within ~10km radius
       const radiusMeters = 10000;
-      const query = `[
-        out:json
-      ];
-      (
-        node["amenity"="college"](around:${radiusMeters},${lat},${lng});
-        node["amenity"="university"](around:${radiusMeters},${lat},${lng});
-        way["amenity"="college"](around:${radiusMeters},${lat},${lng});
-        way["amenity"="university"](around:${radiusMeters},${lat},${lng});
-        relation["amenity"="college"](around:${radiusMeters},${lat},${lng});
-        relation["amenity"="university"](around:${radiusMeters},${lat},${lng});
-      );
-      out center;`;
+      const query = `
+        [out:json];
+        (
+          node["amenity"="college"](around:${radiusMeters},${lat},${lng});
+          node["amenity"="university"](around:${radiusMeters},${lat},${lng});
+          way["amenity"="college"](around:${radiusMeters},${lat},${lng});
+          way["amenity"="university"](around:${radiusMeters},${lat},${lng});
+          relation["amenity"="college"](around:${radiusMeters},${lat},${lng});
+          relation["amenity"="university"](around:${radiusMeters},${lat},${lng});
+        );
+        out center;
+      `;
 
       const endpoints = [
         'https://overpass-api.de/api/interpreter',
@@ -104,41 +103,33 @@ const Analytics = () => {
       ];
 
       let data = null;
-      // Try GET with encoded query first (more CORS-friendly), then POST fallback
       for (const url of endpoints) {
         try {
-          const resp = await fetch(`${url}?data=${encodeURIComponent(query)}`, { headers: { 'Accept': 'application/json' } });
+          const resp = await fetch(`${url}?data=${encodeURIComponent(query)}`);
           if (resp.ok) {
             data = await resp.json();
             break;
           }
         } catch (_) {}
       }
-      if (!data) {
-        for (const url of endpoints) {
-          try {
-            const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain', 'Accept': 'application/json' }, body: query });
-            if (resp.ok) {
-              data = await resp.json();
-              break;
-            }
-          } catch (_) {}
-        }
-      }
       if (!data) throw new Error('Could not fetch nearby colleges');
 
-      return (data.elements || []).map(el => {
-        const center = el.center || (el.lat && el.lon ? { lat: el.lat, lon: el.lon } : null);
-        return {
-          id: el.id,
-          name: el.tags?.name || 'Unnamed',
-          type: el.tags?.amenity || 'college',
-          lat: center?.lat,
-          lng: center?.lon,
-          website: el.tags?.website || el.tags?.url,
-          address: [el.tags?.['addr:housenumber'], el.tags?.['addr:street'], el.tags?.['addr:city']].filter(Boolean).join(', ')
-        };
-      }).filter(p => p.lat && p.lng);
+      return (data.elements || [])
+        .map((el) => {
+          const center = el.center || (el.lat && el.lon ? { lat: el.lat, lon: el.lon } : null);
+          return {
+            id: el.id,
+            name: el.tags?.name || 'Unnamed',
+            type: el.tags?.amenity || 'college',
+            lat: center?.lat,
+            lng: center?.lon,
+            website: el.tags?.website || el.tags?.url,
+            address: [el.tags?.['addr:housenumber'], el.tags?.['addr:street'], el.tags?.['addr:city']]
+              .filter(Boolean)
+              .join(', ')
+          };
+        })
+        .filter((p) => p.lat && p.lng);
     };
 
     try {
@@ -152,11 +143,10 @@ const Analytics = () => {
     } catch (e) {
       console.error('Geolocation error:', e);
       setLocationStatus('denied');
-      setMapError('Location access denied or unavailable. Using default center.');
+      setMapError('Location access denied or unavailable.');
     }
   };
 
-  // On mount: check permission and request if possible
   useEffect(() => {
     let cancelled = false;
     const check = async () => {
@@ -165,31 +155,27 @@ const Analytics = () => {
           const res = await navigator.permissions.query({ name: 'geolocation' });
           if (cancelled) return;
           setLocationStatus(res.state);
-          if (res.state !== 'denied') {
-            // Will trigger browser prompt if 'prompt'
-            requestLocation();
-          }
+          if (res.state !== 'denied') requestLocation();
           res.onchange = () => setLocationStatus(res.state);
         } else {
-          // Fallback: try to request, browser will prompt
           requestLocation();
         }
-      } catch (_) {
+      } catch {
         requestLocation();
       }
     };
     check();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const mapCenter = useMemo(() => {
     if (userPosition) return [userPosition.lat, userPosition.lng];
-    // Fallback center: Maharashtra (approx)
-    return [19.7515, 75.7139];
+    return [19.7515, 75.7139]; // Default: Maharashtra
   }, [userPosition]);
 
   useEffect(() => {
-    // Defer map render to post-mount to avoid StrictMode double-mount glitches
     const t = setTimeout(() => setMapRenderReady(true), 0);
     return () => clearTimeout(t);
   }, []);
@@ -199,7 +185,6 @@ const Analytics = () => {
     const mapRef = useRef(null);
     const markersLayerRef = useRef(null);
 
-    // Fix Leaflet default marker icon URLs for CRA bundling
     useEffect(() => {
       delete L.Icon.Default.prototype._getIconUrl;
       L.Icon.Default.mergeOptions({
@@ -211,78 +196,41 @@ const Analytics = () => {
 
     useEffect(() => {
       if (!containerRef.current || mapRef.current) return;
-      const map = L.map(containerRef.current, {
-        center: center,
-        zoom: 12,
-        zoomControl: true,
-        preferCanvas: true
-      });
+      const map = L.map(containerRef.current, { center, zoom: 12 });
       mapRef.current = map;
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19,
-        attribution: "&copy; OpenStreetMap contributors, &copy; <a href='https://carto.com/attributions'>CARTO</a>"
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
       }).addTo(map);
 
       markersLayerRef.current = L.layerGroup().addTo(map);
-
-      const onResize = () => {
-        try { map.invalidateSize(false); } catch (_) {}
-      };
-      window.addEventListener('resize', onResize);
       return () => {
-        window.removeEventListener('resize', onResize);
-        try { map.remove(); } catch (_) {}
+        try {
+          map.remove();
+        } catch (_) {}
         mapRef.current = null;
         markersLayerRef.current = null;
       };
     }, [center]);
 
-    // Recenter when center changes
-    useEffect(() => {
-      const map = mapRef.current;
-      if (!map) return;
-      map.setView(center, 12, { animate: false });
-    }, [center]);
-
-    // Update markers when userPosition/colleges change
     useEffect(() => {
       const map = mapRef.current;
       const layer = markersLayerRef.current;
       if (!map || !layer) return;
       layer.clearLayers();
 
-      const bounds = L.latLngBounds([]);
-
       if (userPosition) {
-        const userMarker = L.marker([userPosition.lat, userPosition.lng]);
-        userMarker.bindPopup('You are here');
-        userMarker.addTo(layer);
-        bounds.extend([userPosition.lat, userPosition.lng]);
+        L.marker([userPosition.lat, userPosition.lng]).bindPopup('You are here').addTo(layer);
       }
 
       (colleges || []).forEach((c) => {
         const m = L.marker([c.lat, c.lng]);
-        const html = `<div style="min-width:180px">
-          <div style="font-weight:700;margin-bottom:4px">${c.name || 'Unnamed'}</div>
-          <div style="opacity:.9;margin-bottom:6px">${c.address || 'Address unavailable'}</div>
-          ${c.website ? `<a href="${c.website}" target="_blank" rel="noreferrer">Website</a>` : ''}
-        </div>`;
-        m.bindPopup(html);
+        m.bindPopup(`<b>${c.name}</b><br/>${c.address || ''}`);
         m.addTo(layer);
-        bounds.extend([c.lat, c.lng]);
       });
-
-      if (bounds.isValid()) {
-        setTimeout(() => {
-          try { map.fitBounds(bounds.pad(0.2), { animate: false }); } catch (_) {}
-        }, 50);
-      }
     }, [userPosition, colleges]);
 
-    return (
-      <div style={{ height: '100%', width: '100%' }} ref={containerRef} />
-    );
+    return <div style={{ height: '100%', width: '100%' }} ref={containerRef} />;
   });
 
   const goBack = () => navigate('/quiz');
@@ -290,184 +238,34 @@ const Analytics = () => {
 
   return (
     <div className="quiz-results-container analytics-container">
-      <div className="results-background">
-        <div className="floating-shapes">
-          <div className="shape shape-1"></div>
-          <div className="shape shape-2"></div>
-          <div className="shape shape-3"></div>
-          <div className="shape shape-4"></div>
+      <div className="results-header">
+        <h1>Detailed Analytics</h1>
+        <p>Insights powered by our ML model</p>
+      </div>
+
+      {loading && <p>Loading analytics...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+
+      {!loading && !error && result && (
+        <div>
+          <h2>Predicted Course: {result.predicted_course}</h2>
+          <p>Confidence: {Math.round((result.confidence || 0) * 100)}%</p>
+        </div>
+      )}
+
+      <div className="results-section">
+        <h2>Nearby Colleges</h2>
+        <div style={{ height: 400, width: '100%' }}>
+          {mapRenderReady && <NearbyMap center={mapCenter} userPosition={userPosition} colleges={nearbyColleges} />}
         </div>
       </div>
 
-      <div className="results-content">
-        <div className="results-header">
-          <h1>Detailed Analytics</h1>
-          <p>Personalized insights powered by the ML model</p>
-        </div>
-
-        {locationStatus !== 'granted' && (
-          <div className="career-card" style={{ padding: '12px', marginBottom: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-              <span>
-                {locationStatus === 'denied' ? 'Location is blocked. Please allow location in your browser settings to see nearby colleges.' : 'Allow location to show colleges near you.'}
-              </span>
-              <button className="btn btn-accent" onClick={requestLocation}>Enable Location</button>
-            </div>
-          </div>
-        )}
-
-        {loading && (
-          <div className="career-card" style={{ padding: '16px' }}>Loading analytics...</div>
-        )}
-
-        {error && (
-          <div className="career-card" style={{ padding: '16px', color: '#ff6b6b' }}>{error}</div>
-        )}
-
-        {!loading && !error && result && (
-          <>
-            <div className="results-stats">
-              <div className="stat-card">
-                <div className="stat-icon">🎯</div>
-                <h3>{result.predicted_course || '—'}</h3>
-                <p>Predicted Course</p>
-              </div>
-              <div className="stat-card">
-                <div className="stat-icon">🔒</div>
-                <h3>{Math.round((result.confidence || 0) * 100)}%</h3>
-                <p>Confidence</p>
-              </div>
-              <div className="stat-card">
-                <div className="stat-icon">📈</div>
-                <h3>{(result.topFeatures || []).length}</h3>
-                <p>Top Features Considered</p>
-              </div>
-            </div>
-
-            <div className="results-section">
-              <h2>Top Features</h2>
-              <div className="category-results">
-                {(result.topFeatures || []).map(([feature, score], idx) => (
-                  <div key={`${feature}-${idx}`} className="category-card">
-                    <div className="category-rank">
-                      <span className="rank-badge">#{idx + 1}</span>
-                      <span className="category-icon">⭐</span>
-                    </div>
-                    <h3>{feature}</h3>
-                    <div className="score-container">
-                      <div className="score-bar">
-                        <div className="score-fill" style={{ width: `${Math.min(100, (score / 5) * 100)}%` }}></div>
-                      </div>
-                      <span className="score-value">{score}/5</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="results-section">
-              <h2>Recommended Courses</h2>
-              <div className="career-recommendations">
-                {(() => {
-                  const topCourses = (result.recommendedCourses || [])
-                    .flatMap((rec) => (rec.courses || []).map((course) => ({ course, rec })))
-                    .slice(0, 2);
-                  return topCourses.map(({ course, rec }, idx) => (
-                    <div key={`topcourse-${idx}`} className="career-card" style={{ animationDelay: `${idx * 0.1}s` }}>
-                      <h3>{course.course}</h3>
-                      <div style={{ marginBottom: 8, opacity: 0.9 }}>Suggested from: {rec.feature} (score: {rec.score})</div>
-                      <ul>
-                        <li>
-                          {course.overview && (
-                            <div style={{ fontSize: '0.95rem', opacity: 0.9, marginBottom: '6px' }}>
-                              <strong>Overview:</strong> {course.overview}
-                            </div>
-                          )}
-                          {course.eligibility && (
-                            <div style={{ fontSize: '0.95rem', opacity: 0.9, marginBottom: '6px' }}>
-                              <strong>Eligibility:</strong> {course.eligibility.stream}{course.eligibility.exams ? ` • Exams: ${course.eligibility.exams}` : ''}
-                            </div>
-                          )}
-                          {course.salary_range && (
-                            <div style={{ fontSize: '0.95rem', opacity: 0.9, marginBottom: '6px' }}>
-                              <strong>Salary Range:</strong> {course.salary_range}
-                            </div>
-                          )}
-                          {Array.isArray(course.skills_required) && course.skills_required.length > 0 && (
-                            <div style={{ fontSize: '0.95rem', opacity: 0.9, marginBottom: '6px' }}>
-                              <strong>Skills Required:</strong> {course.skills_required.join(', ')}
-                            </div>
-                          )}
-                          {course.job_opportunities && (
-                            <div style={{ fontSize: '0.95rem', opacity: 0.9, marginBottom: '6px' }}>
-                              <strong>Job Opportunities:</strong> {course.job_opportunities}
-                            </div>
-                          )}
-                          {course.youtube_video_url && (
-                            <div style={{ fontSize: '0.95rem', opacity: 0.9, marginBottom: '6px' }}>
-                              <strong>Video Link:</strong> <a href={course.youtube_video_url} target="_blank" rel="noreferrer" style={{ color: '#6a00ff' }}>Watch</a>
-                            </div>
-                          )}
-                          {Array.isArray(course.colleges_in_kolhapur) && course.colleges_in_kolhapur.length > 0 && (
-                            <div style={{ fontSize: '0.95rem', opacity: 0.9 }}>
-                              <strong>Colleges in Kolhapur:</strong> {course.colleges_in_kolhapur.join(', ')}
-                            </div>
-                          )}
-                        </li>
-                      </ul>
-                    </div>
-                  ));
-                })()}
-              </div>
-            </div>
-
-            {result.featureScores && (
-              <div className="results-section">
-                <h2>All Feature Scores</h2>
-                <div className="career-card" style={{ padding: '16px', overflowX: 'auto' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
-                    {Object.entries(result.featureScores).map(([feat, sc]) => (
-                      <div key={feat} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '6px' }}>
-                        <span>{feat}</span>
-                        <span>{sc}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-
-        {/* Map Section - always visible */}
-        <div className="results-section">
-          <h2>Nearby Colleges Map</h2>
-          {mapError && (
-            <div className="career-card" style={{ padding: '12px', color: '#ff6b6b' }}>{mapError}</div>
-          )}
-          <div style={{ height: 420, width: '100%', position: 'relative', borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
-            {mapRenderReady && (
-              <NearbyMap center={mapCenter} userPosition={userPosition} colleges={nearbyColleges} />
-            )}
-          </div>
-          <div style={{ marginTop: 8, opacity: 0.85 }}>
-            Showing {nearbyColleges.length} nearby colleges within ~10 km
-          </div>
-        </div>
-
-        <div className="action-buttons">
-          <button onClick={goBack} className="btn btn-secondary">
-            ← Back to Results
-          </button>
-          <button onClick={goHome} className="btn btn-primary">
-            Go to Home
-          </button>
-        </div>
+      <div className="action-buttons">
+        <button onClick={goBack}>← Back</button>
+        <button onClick={goHome}>Go Home</button>
       </div>
     </div>
   );
 };
 
 export default Analytics;
-
-
