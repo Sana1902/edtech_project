@@ -27,6 +27,7 @@ const Analytics = () => {
 
   // No-op retained for compatibility; not used with MapLibre
  
+const API_BASE = process.env.REACT_APP_API_URL || 'https://skill-map-mh.onrender.com/api';
 
   useEffect(() => {
     const answers = location.state?.answers;
@@ -41,7 +42,7 @@ const Analytics = () => {
         setLoading(true);
         setError(null);
 
-        const response = await fetch('http://localhost:5000/api/ml/predict-career', {
+        const response = await fetch(`${API_BASE}/ml/predict-career`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
