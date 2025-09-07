@@ -29,7 +29,12 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // CORS middleware - Updated to allow multiple origins
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://yourdomain.com'] 
+    ? [
+        'https://edtech-project.vercel.app',
+        'https://edtech-project-git-main.vercel.app',
+        'https://edtech-project-git-develop.vercel.app',
+        process.env.FRONTEND_URL || 'https://edtech-project.vercel.app'
+      ] 
     : [
         'http://localhost:3000', 
         'http://localhost:3001',
@@ -104,30 +109,43 @@ const startServer = async () => {
   try {
     await connectDB();
     
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-      console.log(`Environment: ${process.env.NODE_ENV}`);
-      console.log(`Health check: http://localhost:${PORT}/api/health`);
-      console.log(`CORS enabled for: http://localhost:3000, http://localhost:3001`);
-    });
+    // Only start server if not in Vercel environment
+    if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+      app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+        console.log(`Environment: ${process.env.NODE_ENV}`);
+        console.log(`Health check: http://localhost:${PORT}/api/health`);
+        console.log(`CORS enabled for: http://localhost:3000, http://localhost:3001`);
+      });
+    }
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
   }
 };
 
-startServer();
+// Only start server if not in Vercel environment
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+// Export app for Vercel
+module.exports = app;
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
   console.error('Unhandled Rejection:', err);
   // Close server & exit process
-  process.exit(1);
+  if (!process.env.VERCEL) {
+    process.exit(1);
+  }
 });
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err);
   // Close server & exit process
-  process.exit(1);
+  if (!process.env.VERCEL) {
+    process.exit(1);
+  }
 });
