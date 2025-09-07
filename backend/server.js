@@ -27,24 +27,26 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // CORS middleware - Updated to allow multiple origins
+const allowedOrigins = [
+  'https://edtech-project.vercel.app',
+  'https://edtech-project-git-main.vercel.app',
+  'https://edtech-project-git-develop.vercel.app',
+  'https://edtech-project-mocha.vercel.app', // 👈 your live frontend
+  'http://localhost:3000',
+  'http://localhost:3001'
+];
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? [
-        'https://edtech-project.vercel.app',
-        'https://edtech-project-git-main.vercel.app',
-        'https://edtech-project-git-develop.vercel.app',
-          'https://edtech-project-mocha.vercel.app', 
-        process.env.FRONTEND_URL || 'https://edtech-project.vercel.app'
-      ] 
-    : [
-        'http://localhost:3000', 
-        'http://localhost:3001',
-        'http://192.168.6.1:3000',
-        'http://192.168.1.1:3000',
-        'http://127.0.0.1:3000'
-      ],
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin)) {
+      callback(null, true); // allow if in list or any *.vercel.app
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
+
 
 // Routes
 app.use('/api/auth', authRoutes);
