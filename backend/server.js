@@ -26,13 +26,27 @@ app.use('/api/', limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// CORS middleware - Updated to allow port 3001
+// CORS middleware - Updated to allow multiple origins
+const allowedOrigins = [
+  'https://edtech-project.vercel.app',
+  'https://edtech-project-git-main.vercel.app',
+  'https://edtech-project-git-develop.vercel.app',
+  'https://edtech-project-mocha.vercel.app', // 👈 your live frontend
+  'http://localhost:3000',
+  'http://localhost:3001'
+];
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://yourdomain.com'] 
-    : ['http://localhost:3000', 'http://localhost:3001'], // Added port 3001
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin)) {
+      callback(null, true); // allow if in list or any *.vercel.app
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
+
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -98,30 +112,43 @@ const startServer = async () => {
   try {
     await connectDB();
     
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-      console.log(`Environment: ${process.env.NODE_ENV}`);
-      console.log(`Health check: http://localhost:${PORT}/api/health`);
-      console.log(`CORS enabled for: http://localhost:3000, http://localhost:3001`);
-    });
+    // Only start server if not in Vercel environment
+    if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+      app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+        console.log(`Environment: ${process.env.NODE_ENV}`);
+        console.log(`Health check: http://localhost:${PORT}/api/health`);
+        console.log(`CORS enabled for: http://localhost:3000, http://localhost:3001`);
+      });
+    }
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
   }
 };
 
-startServer();
+// Only start server if not in Vercel environment
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+// Export app for Vercel
+module.exports = app;
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
   console.error('Unhandled Rejection:', err);
   // Close server & exit process
-  process.exit(1);
+  if (!process.env.VERCEL) {
+    process.exit(1);
+  }
 });
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err);
   // Close server & exit process
-  process.exit(1);
+  if (!process.env.VERCEL) {
+    process.exit(1);
+  }
 });

@@ -1,3 +1,7 @@
+import { createContext, useContext, useReducer, useEffect, useMemo, useCallback } from 'react';
+
+// Get API base URL from environment variable
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 import { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 
 const AuthContext = createContext();
@@ -13,12 +17,8 @@ const initialState = {
 const authReducer = (state, action) => {
   switch (action.type) {
     case 'AUTH_START':
-      return {
-        ...state,
-        isLoading: true,
-        error: null
-      };
-    
+      return { ...state, isLoading: true, error: null };
+
     case 'AUTH_SUCCESS':
       return {
         ...state,
@@ -28,39 +28,19 @@ const authReducer = (state, action) => {
         isLoading: false,
         error: null
       };
-    
+
     case 'AUTH_FAILURE':
-      return {
-        ...state,
-        user: null,
-        token: null,
-        isAuthenticated: false,
-        isLoading: false,
-        error: action.payload
-      };
-    
+      return { ...state, user: null, token: null, isAuthenticated: false, isLoading: false, error: action.payload };
+
     case 'LOGOUT':
-      return {
-        ...state,
-        user: null,
-        token: null,
-        isAuthenticated: false,
-        isLoading: false,
-        error: null
-      };
-    
+      return { ...state, user: null, token: null, isAuthenticated: false, isLoading: false, error: null };
+
     case 'CLEAR_ERROR':
-      return {
-        ...state,
-        error: null
-      };
-    
+      return { ...state, error: null };
+
     case 'UPDATE_USER':
-      return {
-        ...state,
-        user: { ...state.user, ...action.payload }
-      };
-    
+      return { ...state, user: { ...state.user, ...action.payload } };
+
     default:
       return state;
   }
@@ -69,14 +49,13 @@ const authReducer = (state, action) => {
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // Check if user is authenticated on app load - only run once
+  // Check if user is authenticated on app load
   useEffect(() => {
     const checkAuthStatus = async () => {
       const token = localStorage.getItem('token');
-      
       if (token) {
         try {
-          const response = await fetch('http://localhost:5000/api/auth/me', {
+          const response = await fetch(`${API_BASE}/auth/me`, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json'
@@ -85,15 +64,8 @@ export const AuthProvider = ({ children }) => {
 
           if (response.ok) {
             const data = await response.json();
-            dispatch({
-              type: 'AUTH_SUCCESS',
-              payload: {
-                user: data.data.user,
-                token
-              }
-            });
+            dispatch({ type: 'AUTH_SUCCESS', payload: { user: data.data.user, token } });
           } else {
-            // Token is invalid, remove it
             localStorage.removeItem('token');
             dispatch({ type: 'LOGOUT' });
           }
@@ -110,18 +82,61 @@ export const AuthProvider = ({ children }) => {
     checkAuthStatus();
   }, []); // Empty dependency array - only run once on mount
 
-  // Real-time updates removed to prevent infinite loop
+  // Periodically refresh current user for real-time updates and refresh on tab focus
+  useEffect(() => {
+    let intervalId;
+
+    const fetchCurrentUser = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      try {
+        const response = await fetch('http://localhost:5000/api/auth/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          dispatch({ type: 'UPDATE_USER', payload: data.data.user });
+        } else if (response.status === 401) {
+          // token invalid/expired
+          localStorage.removeItem('token');
+          dispatch({ type: 'LOGOUT' });
+        }
+      } catch (error) {
+        // Network errors are ignored for periodic refresh
+        // console.debug('Periodic auth refresh error:', error);
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchCurrentUser();
+      }
+    };
+
+    if (state.isAuthenticated) {
+      // initial immediate refresh to sync
+      fetchCurrentUser();
+      // poll every 30 seconds (within server rate limits)
+      intervalId = setInterval(fetchCurrentUser, 30000);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [state.isAuthenticated]);
 
   // Login function
   const login = useCallback(async (email, password) => {
     dispatch({ type: 'AUTH_START' });
-    
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
 
@@ -129,27 +144,15 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         localStorage.setItem('token', data.data.token);
-        dispatch({
-          type: 'AUTH_SUCCESS',
-          payload: {
-            user: data.data.user,
-            token: data.data.token
-          }
-        });
+        dispatch({ type: 'AUTH_SUCCESS', payload: { user: data.data.user, token: data.data.token } });
         return { success: true };
       } else {
-        dispatch({
-          type: 'AUTH_FAILURE',
-          payload: data.message || 'Login failed'
-        });
+        dispatch({ type: 'AUTH_FAILURE', payload: data.message || 'Login failed' });
         return { success: false, error: data.message };
       }
     } catch (error) {
       console.error('Login error:', error);
-      dispatch({
-        type: 'AUTH_FAILURE',
-        payload: 'Network error. Please try again.'
-      });
+      dispatch({ type: 'AUTH_FAILURE', payload: 'Network error. Please try again.' });
       return { success: false, error: 'Network error. Please try again.' };
     }
   }, []);
@@ -157,13 +160,10 @@ export const AuthProvider = ({ children }) => {
   // Register function
   const register = useCallback(async (name, email, password, role = 'student') => {
     dispatch({ type: 'AUTH_START' });
-    
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch(`${API_BASE}/auth/register`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, role })
       });
 
@@ -171,27 +171,15 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         localStorage.setItem('token', data.data.token);
-        dispatch({
-          type: 'AUTH_SUCCESS',
-          payload: {
-            user: data.data.user,
-            token: data.data.token
-          }
-        });
+        dispatch({ type: 'AUTH_SUCCESS', payload: { user: data.data.user, token: data.data.token } });
         return { success: true };
       } else {
-        dispatch({
-          type: 'AUTH_FAILURE',
-          payload: data.message || 'Registration failed'
-        });
+        dispatch({ type: 'AUTH_FAILURE', payload: data.message || 'Registration failed' });
         return { success: false, error: data.message };
       }
     } catch (error) {
       console.error('Registration error:', error);
-      dispatch({
-        type: 'AUTH_FAILURE',
-        payload: 'Network error. Please try again.'
-      });
+      dispatch({ type: 'AUTH_FAILURE', payload: 'Network error. Please try again.' });
       return { success: false, error: 'Network error. Please try again.' };
     }
   }, []);
@@ -201,12 +189,9 @@ export const AuthProvider = ({ children }) => {
     try {
       const token = localStorage.getItem('token');
       if (token) {
-        await fetch('http://localhost:5000/api/auth/logout', {
+        await fetch(`${API_BASE}/auth/logout`, {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
         });
       }
     } catch (error) {
@@ -221,22 +206,16 @@ export const AuthProvider = ({ children }) => {
   const updateProfile = useCallback(async (updates) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/auth/me', {
+      const response = await fetch(`${API_BASE}/auth/me`, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(updates)
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        dispatch({
-          type: 'UPDATE_USER',
-          payload: data.data.user
-        });
+        dispatch({ type: 'UPDATE_USER', payload: data.data.user });
         return { success: true };
       } else {
         return { success: false, error: data.message };
@@ -248,30 +227,25 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Clear error
-  const clearError = useCallback(() => {
+  const clearError = () => {
     dispatch({ type: 'CLEAR_ERROR' });
-  }, []);
+  };
 
-  const value = {
+  // Memoized context value
+  const value = useMemo(() => ({
     ...state,
     login,
     register,
     logout,
     updateProfile,
     clearError
-  };
+  }), [state, login, register, logout, updateProfile, clearError]);
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };
