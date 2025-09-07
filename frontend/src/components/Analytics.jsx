@@ -26,7 +26,7 @@ const Analytics = () => {
   const [locationStatus, setLocationStatus] = useState('unknown'); // 'granted' | 'denied' | 'prompt' | 'unknown'
 
   // No-op retained for compatibility; not used with MapLibre
-  const safeInvalidateSize = () => {};
+ 
 
   useEffect(() => {
     const answers = location.state?.answers;
