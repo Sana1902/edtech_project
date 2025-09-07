@@ -33,6 +33,7 @@ app.use(cors({
         'https://edtech-project.vercel.app',
         'https://edtech-project-git-main.vercel.app',
         'https://edtech-project-git-develop.vercel.app',
+          'https://edtech-project-mocha.vercel.app', 
         process.env.FRONTEND_URL || 'https://edtech-project.vercel.app'
       ] 
     : [
