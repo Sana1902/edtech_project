@@ -8,7 +8,7 @@ import 'leaflet/dist/leaflet.css';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
+const API_BASE = process.env.REACT_APP_API_URL || 'https://skill-map-mh.onrender.com/api';
 // Leaflet removed; using MapLibre for map rendering
 
 const Analytics = () => {
@@ -25,7 +25,7 @@ const Analytics = () => {
   const [mapRenderReady, setMapRenderReady] = useState(false);
   const [locationStatus, setLocationStatus] = useState('unknown'); // 'granted' | 'denied' | 'prompt' | 'unknown'
 // Put this at the top of the file, outside the component
-const API_BASE = process.env.REACT_APP_API_URL || 'https://skill-map-mh.onrender.com/api';
+
 // ✅ no API_BASE here
 
 
