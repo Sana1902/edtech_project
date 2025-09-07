@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useEffect } from 'react';
+import { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 
 const AuthContext = createContext();
 
@@ -110,56 +110,10 @@ export const AuthProvider = ({ children }) => {
     checkAuthStatus();
   }, []); // Empty dependency array - only run once on mount
 
-  // Periodically refresh current user for real-time updates and refresh on tab focus
-  useEffect(() => {
-    let intervalId;
-
-    const fetchCurrentUser = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-      try {
-        const response = await fetch('http://localhost:5000/api/auth/me', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        if (response.ok) {
-          const data = await response.json();
-          dispatch({ type: 'UPDATE_USER', payload: data.data.user });
-        } else if (response.status === 401) {
-          // token invalid/expired
-          localStorage.removeItem('token');
-          dispatch({ type: 'LOGOUT' });
-        }
-      } catch (error) {
-        // Network errors are ignored for periodic refresh
-        // console.debug('Periodic auth refresh error:', error);
-      }
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        fetchCurrentUser();
-      }
-    };
-
-    if (state.isAuthenticated) {
-      // initial immediate refresh to sync
-      fetchCurrentUser();
-      // poll every 30 seconds (within server rate limits)
-      intervalId = setInterval(fetchCurrentUser, 30000);
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-    }
-
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [state.isAuthenticated]);
+  // Real-time updates removed to prevent infinite loop
 
   // Login function
-  const login = async (email, password) => {
+  const login = useCallback(async (email, password) => {
     dispatch({ type: 'AUTH_START' });
     
     try {
@@ -198,10 +152,10 @@ export const AuthProvider = ({ children }) => {
       });
       return { success: false, error: 'Network error. Please try again.' };
     }
-  };
+  }, []);
 
   // Register function
-  const register = async (name, email, password, role = 'student') => {
+  const register = useCallback(async (name, email, password, role = 'student') => {
     dispatch({ type: 'AUTH_START' });
     
     try {
@@ -240,10 +194,10 @@ export const AuthProvider = ({ children }) => {
       });
       return { success: false, error: 'Network error. Please try again.' };
     }
-  };
+  }, []);
 
   // Logout function
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       if (token) {
@@ -261,10 +215,10 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('token');
       dispatch({ type: 'LOGOUT' });
     }
-  };
+  }, []);
 
   // Update user profile
-  const updateProfile = async (updates) => {
+  const updateProfile = useCallback(async (updates) => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:5000/api/auth/me', {
@@ -291,12 +245,12 @@ export const AuthProvider = ({ children }) => {
       console.error('Profile update error:', error);
       return { success: false, error: 'Network error. Please try again.' };
     }
-  };
+  }, []);
 
   // Clear error
-  const clearError = () => {
+  const clearError = useCallback(() => {
     dispatch({ type: 'CLEAR_ERROR' });
-  };
+  }, []);
 
   const value = {
     ...state,
