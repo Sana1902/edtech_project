@@ -12,31 +12,35 @@ const LanguageToggle = () => {
     script.async = true;
     
     window.googleTranslateElementInit = () => {
-      new window.google.translate.TranslateElement({
-        pageLanguage: 'en',
-        includedLanguages: 'en,mr',
-        layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-        autoDisplay: false
-      }, 'google_translate_element');
+        new window.google.translate.TranslateElement({
+          pageLanguage: 'en',
+          includedLanguages: 'en,mr',
+          layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+          autoDisplay: false,
+        multilanguagePage: true
+        }, 'google_translate_element');
+        
+        console.log('Google Translate initialized');
     };
     
     document.head.appendChild(script);
     
-    // Initialize language from localStorage
-    const savedLang = localStorage.getItem('selectedLanguage') || 'en';
-    setCurrentLang(savedLang);
-    document.documentElement.setAttribute('lang', savedLang);
-    
-    // Apply saved language after Google Translate loads
-    setTimeout(() => {
-      if (savedLang !== 'en') {
-        const select = document.querySelector('select.goog-te-combo');
-        if (select) {
-          select.value = savedLang;
-          select.dispatchEvent(new Event('change'));
-        }
-      }
-    }, 1000);
+    // Check if there's a saved language preference
+    const savedLang = localStorage.getItem('selectedLanguage');
+    if (savedLang === 'mr') {
+      // If Marathi was previously selected, set the cookie
+      document.cookie = 'googtrans=/en/mr; path=/; SameSite=Lax';
+      setCurrentLang('mr');
+      document.documentElement.setAttribute('lang', 'mr');
+      console.log('Restoring Marathi translation');
+    } else {
+      // Default to English
+      setCurrentLang('en');
+      document.documentElement.setAttribute('lang', 'en');
+      // Clear any translation cookies
+      document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      console.log('Setting English as default');
+    }
   }, []);
 
   const switchLanguage = (langCode) => {
@@ -51,15 +55,21 @@ const LanguageToggle = () => {
     // Set document language attribute
     document.documentElement.setAttribute('lang', langCode);
     
-    // Use Google Translate to change language
-    const select = document.querySelector('select.goog-te-combo');
-    if (select) {
-      select.value = langCode;
-      select.dispatchEvent(new Event('change'));
+    // Simple approach: reload page with language preference
+    if (langCode === 'mr') {
+      // Set cookie for Marathi translation
+      document.cookie = 'googtrans=/en/mr; path=/; SameSite=Lax';
+      console.log('Setting Marathi translation cookie');
     } else {
-      // Fallback: reload page
-      window.location.reload();
+      // Clear cookie for English
+      document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      console.log('Clearing translation cookie for English');
     }
+    
+    // Reload page to apply language change
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
   };
 
   return (
@@ -69,23 +79,23 @@ const LanguageToggle = () => {
       
       {/* Language toggle buttons */}
       <div className="lang-toggle lang-top-right">
-        <button
+      <button
           className={`lang-btn ${currentLang === 'en' ? 'active' : ''}`}
-          onClick={() => switchLanguage('en')}
-          aria-label="Switch to English"
-          title="Switch to English"
-        >
-          EN
-        </button>
-        <button
+        onClick={() => switchLanguage('en')}
+        aria-label="Switch to English"
+        title="Switch to English"
+      >
+        EN
+      </button>
+      <button
           className={`lang-btn ${currentLang === 'mr' ? 'active' : ''}`}
-          onClick={() => switchLanguage('mr')}
-          aria-label="Switch to Marathi"
-          title="Switch to Marathi"
-        >
-          मराठी
-        </button>
-      </div>
+        onClick={() => switchLanguage('mr')}
+        aria-label="Switch to Marathi"
+        title="Switch to Marathi"
+      >
+        मराठी
+      </button>
+    </div>
     </>
   );
 };
