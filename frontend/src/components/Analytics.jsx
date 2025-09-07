@@ -24,10 +24,10 @@ const Analytics = () => {
   const [mapError, setMapError] = useState(null);
   const [mapRenderReady, setMapRenderReady] = useState(false);
   const [locationStatus, setLocationStatus] = useState('unknown'); // 'granted' | 'denied' | 'prompt' | 'unknown'
-
-  // No-op retained for compatibility; not used with MapLibre
- 
+// Put this at the top of the file, outside the component
 const API_BASE = process.env.REACT_APP_API_URL || 'https://skill-map-mh.onrender.com/api';
+// ✅ no API_BASE here
+
 
   useEffect(() => {
     const answers = location.state?.answers;
