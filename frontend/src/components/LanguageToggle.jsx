@@ -6,24 +6,52 @@ const LanguageToggle = () => {
 
   // Initialize Google Translate
   useEffect(() => {
+    // Check if Google Translate is already loaded
+    if (window.google && window.google.translate) {
+      initializeTranslate();
+      return;
+    }
+
+    // Check if script is already being loaded
+    if (document.querySelector('script[src*="translate.google.com"]')) {
+      // Wait for existing script to load
+      const checkGoogle = setInterval(() => {
+        if (window.google && window.google.translate) {
+          clearInterval(checkGoogle);
+          initializeTranslate();
+        }
+      }, 100);
+      return;
+    }
+
     // Load Google Translate script
     const script = document.createElement('script');
     script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
     script.async = true;
     
     window.googleTranslateElementInit = () => {
-        new window.google.translate.TranslateElement({
-          pageLanguage: 'en',
-          includedLanguages: 'en,mr',
-          layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-          autoDisplay: false,
-        multilanguagePage: true
-        }, 'google_translate_element');
-        
-        console.log('Google Translate initialized');
+      initializeTranslate();
     };
     
     document.head.appendChild(script);
+
+    function initializeTranslate() {
+      // Check if element already exists
+      const existingElement = document.getElementById('google_translate_element');
+      if (existingElement && existingElement.children.length > 0) {
+        return; // Already initialized
+      }
+
+      new window.google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,mr',
+        layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay: false,
+        multilanguagePage: true
+      }, 'google_translate_element');
+      
+      console.log('Google Translate initialized');
+    }
     
     // Check if there's a saved language preference
     const savedLang = localStorage.getItem('selectedLanguage');

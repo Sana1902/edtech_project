@@ -2,7 +2,6 @@ import { createContext, useContext, useReducer, useEffect, useMemo, useCallback 
 
 // Get API base URL from environment variable
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-import { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 
 const AuthContext = createContext();
 
@@ -227,9 +226,9 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Clear error
-  const clearError = () => {
+  const clearError = useCallback(() => {
     dispatch({ type: 'CLEAR_ERROR' });
-  };
+  }, []);
 
   // Memoized context value
   const value = useMemo(() => ({
